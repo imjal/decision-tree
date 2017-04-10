@@ -38,6 +38,8 @@ namespace DecisionTree
         {
             bw.Write(variable);
             bw.Write(split);
+            bw.Write(nSignal);
+            bw.Write(nBackground);
 
             bool isfinal = IsFinal();
             bw.Write(isfinal);
@@ -63,6 +65,9 @@ namespace DecisionTree
         {
             variable = br.ReadInt32();
             split = br.ReadDouble();
+            nSignal = br.ReadInt32();
+            nBackground = br.ReadInt32();
+
             bool fin = br.ReadBoolean();
             if (!fin)
             {
@@ -155,7 +160,7 @@ namespace DecisionTree
             // TODO set the values of variable and split here		
             // Return true if you were able to find a useful variable, and false if you were not and want to stop calculation here
 
-            // If you are going to branch, you should end with:
+            // If you are going to branch, you should end with, for example:
             // variable = 3; // The index number of the variable you want
             // split = 2.55; // The value of the cut
             // return true;
