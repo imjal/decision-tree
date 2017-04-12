@@ -164,8 +164,78 @@ namespace DecisionTree
             // return false;
             // Make sure to do this or your code will run forever!
 
-            throw new NotImplementedException();
+
+            double lowGini = 999;
+            for (int i = 0; i < signal.Points[0].Variables.Length; i++)
+            {
+                foreach (DataPoint d in signal.Points)
+                {
+                    Tuple<int, int> sigGroup = Split(i, d.Variables[i], signal);
+                    Tuple<int, int> backGroup = Split(i, d.Variables[i], background);
+                    double gini = gini_index(sigGroup, backGroup);
+                    if (gini < lowGini)
+                    {
+                        split = d.Variables[i];
+                        lowGini = gini;
+                        variable = i;
+                    }
+                }
+            }
+
+            return bestSplit;
         }
+
+        public static double gini_index(Tuple<int, int> signal, Tuple<int, int> background)
+        {
+            double total1 = signal.Item1 + background.Item1;
+            double giniIndex = 0;
+            if (total1 != 0)
+            {
+                double proportion1 = signal.Item1 / total1;
+                double proportion2 = background.Item1 / (total1);
+                giniIndex += proportion1 * proportion2;
+            }
+            else
+            {
+                giniIndex = 0.25;
+            }
+
+            double total2 = signal.Item2 + background.Item2;
+            if (total2 != 0)
+            {
+                double proportion3 = signal.Item2 / total2;
+                double proportion4 = background.Item2 / total2;
+                giniIndex += proportion3 * proportion4;
+            }
+            else
+            {
+                giniIndex = 0.25;
+            }
+
+
+            return giniIndex;
+
+        }
+
+        public static Tuple<int, int> Split(int variableIndex, double cut, DataSet ds)
+        {
+            int left = 0;
+            int right = 0;
+            foreach (DataPoint d in ds.Points)
+            {
+                if (d.Variables[variableIndex] < cut)
+                {
+                    left++;
+                }
+                else
+                {
+                    right++;
+                }
+            }
+            return new Tuple<int, int>(left, right);
+        }
+
+       
 
     }
 }
