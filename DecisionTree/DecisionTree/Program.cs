@@ -17,7 +17,8 @@ namespace DecisionTree
             Level1();
 
         }
-
+        //This level creates a Boosted Decision Tree that reweights the misclassified items.
+        //Then it is tested on the training data again, and reweights accordingly 10 more times to create a forest.
         public static void Level3()
         {
             DataSet ds = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\signal.dat");
@@ -82,17 +83,7 @@ namespace DecisionTree
                 alpha.Add(weight);
 
             }
-            alpha.Add(29.2511532547412);
-            alpha.Add(31.0992135511192);
-            alpha.Add(29.416666667);
-            alpha.Add(31.0992135511192);
-            alpha.Add(29.416666667);
-            alpha.Add(31.0992135511192);
-            alpha.Add(29.416666667);
-            alpha.Add(31.0992135511192);
-            alpha.Add(29.416666667);
-            alpha.Add(31.0992135511192);
-            alpha.Add(29.416666667);
+
             DataSet dtd = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\decisionTreeData.dat");
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(@"C:\Users\student\Documents\Compusci\Homework7.2\results.txt", true))
@@ -112,7 +103,7 @@ namespace DecisionTree
             }
         }
 
-
+        // This level creates a decision tree, and tests untrained data. 
         public static void Level2()
         {
             DataSet ds = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\decisionTreeData.dat");
@@ -135,7 +126,7 @@ namespace DecisionTree
            
         }
 
-
+        //This level calculates the best split of a decision tree, by finding the minimum of the gini index. 
         public static void Level1()
         {
             DataSet ds = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\signal.dat");
