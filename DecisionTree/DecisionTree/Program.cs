@@ -11,13 +11,130 @@ namespace DecisionTree
     {
         public static int varIndex = 0;
         public static double bestGini = 999; 
+
         static void Main(string[] args)
+        {
+            Level1();
+
+        }
+
+        public static void Level3()
         {
             DataSet ds = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\signal.dat");
             DataSet dsB = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\background.dat");
+            List<double> alpha = new List<double>();
+            var tree = new Leaf();
 
-            Level1();
+            for (int i = 0; i < 10; i++)
+            {
+                tree = new Leaf();
+                tree.Train(ds, dsB);
+
+                tree.WriteToFile(@"C:\Users\student\Documents\Compusci\Homework7.2\tree" + i + ".txt");
+                Console.WriteLine("Tree #" + i + " is finished.");
+                int count = 0;
+                foreach (var point in ds.Points)
+                {
+                    double purity = tree.RunDataPoint(point);
+                    if (purity < .5)
+                    {
+                        count++;
+                    }
+                }
+                foreach (var point in dsB.Points)
+                {
+                    double purity = tree.RunDataPoint(point);
+                    if (purity > 0.5)
+                    {
+                        count++;
+                    }
+                }
+                Console.WriteLine("Finished Calculating Weights for tree " + i);
+                double r = count / (ds.Points.Count + dsB.Points.Count + 0.0);
+                double weight = ((1 - r) / r) + 20;
+                Console.WriteLine(weight);
+                foreach (var point in ds.Points)
+                {
+                    double purity = tree.RunDataPoint(point);
+                    if (purity < .5)
+                    {
+                        point.Weight = weight;
+                        point.FinalWeight += Math.Log(weight);
+                    }
+                    else
+                    {
+                        point.Weight = 1;
+                    }
+                }
+                foreach (var point in dsB.Points)
+                {
+                    double purity = tree.RunDataPoint(point);
+                    if (purity > 0.5)
+                    {
+                        point.Weight = weight;
+                        point.FinalWeight += Math.Log(weight);
+                    }
+                    else
+                    {
+                        point.Weight = 1;
+                    }
+                }
+                alpha.Add(weight);
+
+            }
+            alpha.Add(29.2511532547412);
+            alpha.Add(31.0992135511192);
+            alpha.Add(29.416666667);
+            alpha.Add(31.0992135511192);
+            alpha.Add(29.416666667);
+            alpha.Add(31.0992135511192);
+            alpha.Add(29.416666667);
+            alpha.Add(31.0992135511192);
+            alpha.Add(29.416666667);
+            alpha.Add(31.0992135511192);
+            alpha.Add(29.416666667);
+            DataSet dtd = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\decisionTreeData.dat");
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"C:\Users\student\Documents\Compusci\Homework7.2\results.txt", true))
+            {
+                foreach (var point in dtd.Points)
+                {
+                    double total = 0;
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var treeNum = new Leaf(@"C:\Users\student\Documents\Compusci\Homework7.2\tree" + i + ".txt");
+                        double purity = treeNum.RunDataPoint(point);
+                        total = Math.Log(alpha[i]) * purity;
+                        file.WriteLine(total);
+
+                    }
+                }
+            }
         }
+
+
+        public static void Level2()
+        {
+            DataSet ds = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\decisionTreeData.dat");
+
+            var tree = new Leaf(@"C:\Users\student\Documents\Compusci\Homework 7\treeBasic.txt");
+            /**
+            tree.Train(ds, dsB);
+            tree.WriteToFile(@"C:\Users\student\Documents\Compusci\Homework 7\tree1.txt");
+    **/
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"C:\Users\student\Documents\Compusci\Homework 7\level2results.txt", true))
+            {
+                foreach (var point in ds.Points)
+                {
+                    file.WriteLine(tree.RunDataPoint(point));
+                }
+            }
+            
+
+           
+        }
+
 
         public static void Level1()
         {
@@ -29,36 +146,27 @@ namespace DecisionTree
             Console.WriteLine("Variable: " + varIndex);
             Console.WriteLine("Gini Score: " + bestGini);
 
+            DataSet dstd = new DataSet(@"C:\Users\student\Documents\Compusci\Homework 7\decisionTreeData.dat");
+
+
             int i = 0;
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(@"C:\Users\student\Documents\Compusci\Homework 7\results.txt", true))
             {
-                foreach (DataPoint p in dsB.Points)
+                foreach (DataPoint p in dstd.Points)
                 {
                     if (p.Variables[0] < split)
                     {
-                        file.WriteLine(i + "," + 0);
+                        file.WriteLine("0");
                         i++;
                     }
                     else
                     {
-                        file.WriteLine(i + "," + 1);
+                        file.WriteLine("1");
                         i++;
                     }
                 }
-                foreach (DataPoint p in ds.Points)
-                {
-                    if (p.Variables[0] < split)
-                    {
-                        file.WriteLine(i + "," + 0);
-                        i++;
-                    }
-                    else
-                    {
-                        file.WriteLine(i + "," + 1);
-                        i++;
-                    }
-                }
+                
             }
 
         }

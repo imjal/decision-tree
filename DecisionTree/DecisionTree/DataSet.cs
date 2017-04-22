@@ -16,6 +16,7 @@ namespace DecisionTree
 
         public void AddDataPoint(DataPoint point)
         {
+            point.Weight = 1;
             Points.Add(point);
         }
 

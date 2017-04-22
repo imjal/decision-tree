@@ -12,9 +12,41 @@ namespace DecisionTree
     {
         public double[] Variables { get; set; }
 
+        public double Weight
+        {
+            get
+            {
+                return weight;
+            }
+
+            set
+            {
+                weight = value;
+            }
+        }
+
+        public double FinalWeight
+        {
+            get
+            {
+                return finalWeight;
+            }
+
+            set
+            {
+                finalWeight = value;
+            }
+        }
+
+        private double finalWeight;
+
+        private double weight;
+
         public DataPoint(int nvar)
         {
             Variables = new double[nvar];
+            weight = 1;
+            FinalWeight = 0;
         }
 
         abstract public string GetName(int index);

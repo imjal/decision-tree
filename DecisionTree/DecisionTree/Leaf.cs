@@ -83,8 +83,8 @@ namespace DecisionTree
 
         public double GetPurity()
         {
-            // TODO: Finish this function so that it returns the purity of the leaf
-            throw new NotImplementedException();
+
+            return nSignal/(nSignal + 0.0 + nBackground);
         }
 
         public double RunDataPoint(DataPoint dataPoint)
@@ -157,47 +157,54 @@ namespace DecisionTree
 
         private bool chooseVariable(DataSet signal, DataSet background)
         {
-            // TODO set the values of variable and split here		
-            // Return true if you were able to find a useful variable, and false if you were not and want to stop calculation here
-
-            // If you are going to branch, you should end with, for example:
-            // variable = 3; // The index number of the variable you want
-            // split = 2.55; // The value of the cut
-            // return true;
-
-            // Or if you cannot split usefully, you should
-            // return false;
-            // Make sure to do this or your code will run forever!
-
-
             double lowGini = 999;
+            Tuple<int, int> sigGroup = new Tuple<int, int>(0,0);
+            Tuple<int, int> backGroup = new Tuple<int, int>(0, 0);
+            double signalLeft = 0;
+            double signalRight = 0;
+            double backgroundLeft = 0;
+            double backgroundRight = 0; 
+
             for (int i = 0; i < signal.Points[0].Variables.Length; i++)
             {
-                foreach (DataPoint d in signal.Points)
+                for (int j = 0; j < signal.Points.Count; j+=10)
                 {
-                    Tuple<int, int> sigGroup = Split(i, d.Variables[i], signal);
-                    Tuple<int, int> backGroup = Split(i, d.Variables[i], background);
+                    sigGroup = Split(i, signal.Points[j].Variables[i], signal);
+                    backGroup = Split(i, signal.Points[j].Variables[i], background);
+                    if (sigGroup.Item2 < 50 || sigGroup.Item1 < 50 || backGroup.Item1 < 50 || backGroup.Item2 < 50)
+                    {
+                        continue;
+                    }
                     double gini = gini_index(sigGroup, backGroup);
                     if (gini < lowGini)
                     {
-                        split = d.Variables[i];
+                        signalLeft = sigGroup.Item1;
+                        signalRight = sigGroup.Item2;
+                        backgroundLeft = backGroup.Item1;
+                        backgroundRight = backGroup.Item2; 
+
+                        split = signal.Points[j].Variables[i];
                         lowGini = gini;
                         variable = i;
                     }
                 }
+                
+           }
+            if (signalLeft < 50 || signalRight < 50 || backgroundLeft < 50 || backgroundRight < 50)
+            {
+                return false;
             }
-
-            return bestSplit;
+            return true;
         }
 
         public static double gini_index(Tuple<int, int> signal, Tuple<int, int> background)
         {
-            double total1 = signal.Item1 + background.Item1;
+            double total1 = signal.Item1 + background.Item1 +0.0;
             double giniIndex = 0;
             if (total1 != 0)
             {
-                double proportion1 = signal.Item1 / total1;
-                double proportion2 = background.Item1 / (total1);
+                double proportion1 = signal.Item1 / (total1+0.0);
+                double proportion2 = background.Item1 / (total1*1.0);
                 giniIndex += proportion1 * proportion2;
             }
             else
@@ -208,8 +215,8 @@ namespace DecisionTree
             double total2 = signal.Item2 + background.Item2;
             if (total2 != 0)
             {
-                double proportion3 = signal.Item2 / total2;
-                double proportion4 = background.Item2 / total2;
+                double proportion3 = signal.Item2 / (total2*1.0);
+                double proportion4 = background.Item2 / (total2*1.0);
                 giniIndex += proportion3 * proportion4;
             }
             else
@@ -217,9 +224,7 @@ namespace DecisionTree
                 giniIndex = 0.25;
             }
 
-
             return giniIndex;
-
         }
 
         public static Tuple<int, int> Split(int variableIndex, double cut, DataSet ds)
@@ -230,17 +235,15 @@ namespace DecisionTree
             {
                 if (d.Variables[variableIndex] < cut)
                 {
-                    left++;
+                    left += (int)Math.Round(d.Weight); 
                 }
                 else
                 {
-                    right++;
+                    right += (int)Math.Round(d.Weight);
                 }
             }
             return new Tuple<int, int>(left, right);
         }
-
-       
 
     }
 }
